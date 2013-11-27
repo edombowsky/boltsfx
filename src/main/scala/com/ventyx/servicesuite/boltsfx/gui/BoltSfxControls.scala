@@ -7,7 +7,6 @@ import scalafx.event.ActionEvent
 import scalafx.stage.{Modality, Stage}
 import scalafx.scene.image.{ImageView, Image}
 import scalafx.scene.layout._
-import scalafx.geometry.Pos
 
 class BoltSfxControls(applicationIcon: String, aboutBoxImage: String, applicationStyleSheet: String) extends AnchorPane {
   import scalafx.Includes._
