@@ -13,8 +13,8 @@ class BoltSfxControls(applicationIcon: String, aboutBoxImage: String, applicatio
   import scalafx.Includes._
 
   def menuBar = new MenuBar {
-    minWidth = 590.0
-    prefWidth = 4000.0
+    minWidth = 590
+    prefWidth = 4000
     useSystemMenuBar = true
     styleClass ++= Seq("menu-bar")
 
@@ -212,8 +212,8 @@ class BoltSfxControls(applicationIcon: String, aboutBoxImage: String, applicatio
     layoutX = 14.0
     layoutY = 256.0
     opacity = 1.0
-    minHeight = 262.0
-    minWidth = 547.0
+    prefHeight = 262.0
+    prefWidth = 547.0
     styleClass ++= Seq("tab-pane")
     //tabClosingPolicy = "UNAVAILABLE"
 
