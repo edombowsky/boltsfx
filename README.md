@@ -1,34 +1,19 @@
-Skeleton
-------------
+# Bolt - The Fastest Way to Build a Server
 
-This project aims to simplify creating a project from scratch.It's simpler than g8 because it doesn't require any additional tools, just clone, build and run.
-It provides a simple way to configure:
+## Overview
 
-     Scala 2.10.2
-     SBT 0.12.3
-     ScalaTest 2.0M5b2
-     IntelliJ IDEA
-     Scala-IDE 3.0
+Bolt automates a significant portion of the VSS9 server build process. 
 
-Use
----------------
-Clone and update the project name from build.sbt
+## Reference
+The Java Swing application this was based on is documented here: http://viki.ventyx.us.abb.com/confluence/display/YPRPRJ/Bolt+-+The+Fastest+Way+to+Build+a+Server
 
-    git clone git://github.com/fractal/skeleton my-project
-    cd my-project
-    rm -rf .git
-    vi build-sbt # change name to my-project, and organization to something that suits you
-    sbt
-    test
-    gen-idea
-    eclipse
-
-Requires
----------------
-* [sbt 0.12.3](https://scala-sbt.org]
-
-Recommends
----------------
-* Latest IDEA 12+ and Scala and SBT plugin.
-* Latest [Scala IDE 3](http://scala-ide.org/download/). Works great out of the box and offers ScalaTest integration  
-* Read [sbt eclipse](https://github.com/typesafehub/sbteclipse/wiki/Using-sbteclipse) for more details.
+Some websites that helped me along the way to get this application running:
+- [ScalaFx](http://www.scalafx.org)
+- [scalafx/scalafx](https://github.com/scalafx/scalafx)
+- [ScalaFX-Tutorials](https://github.com/scalafx/ScalaFX-Tutorials)
+- [vigoo/scalafxml](https://github.com/vigoo/scalafxml)
+- [ScalaFX with FXML Tutorial](http://vigoo.github.io/posts/2014-01-12-scalafx-with-fxml.html)
+- [ScalaFX – Alerts and Dialogs](https://codingonthestaircase.wordpress.com/category/scalafx/)
+- [Why I'm getting javafx.fxml.LoadException even the path of the fxml file is correct](http://stackoverflow.com/questions/28844503/why-im-getting-javafx-fxml-loadexception-even-the-path-of-the-fxml-file-is-corr)
+- [Javafx error exception in Application start method no controller specified](http://stackoverflow.com/questions/30267459/javafx-error-exception-in-application-start-method-no-controller-specified)
+- [JavaFX Dialogs (official)](http://code.makery.ch/blog/javafx-dialogs-official/)
