@@ -13,6 +13,9 @@ The following environment variables must be set:
 - VIEW
 - SERVICE_SUITE_VERSION
 - WLS_DIR
+- ADVANTEX_dbInstance
+- ADVANTEX_dbPassword
+- export ADVANTEX_dbUser
 
 For example:
 ```shell
@@ -22,7 +25,12 @@ export OS=LINUX
 export VIEW=$PWD
 export SERVICE_SUITE_VERSION=95.0.0
 export WLS_DIR=$PWD/TOP
+export ADVANTEX_dbInstance=dellr815c_r12102
+export ADVANTEX_dbPassword=emd1
+export ADVANTEX_dbUser=emd1
 ```
+
+The variables `ADVANTEX_dbInstance`, `ADVANTEX_dbPassword`, and `ADVANTEX_dbUser` are normally set when the `$TOP/etc/profile.service_suite` gets called during the login process. This is because thes values are stored in the vssrt file in an encrypted form and need to be decrypted.
 
 ## Reference
 The Java Swing application this was based on is documented here: http://viki.ventyx.us.abb.com/confluence/display/YPRPRJ/Bolt+-+The+Fastest+Way+to+Build+a+Server
