@@ -4,6 +4,26 @@
 
 Bolt automates a significant portion of the VSS9 server build process. 
 
+## Running
+
+The following environment variables must be set:
+- TOP
+- CDS_TOP
+- OS
+- VIEW
+- SERVICE_SUITE_VERSION
+- WLS_DIR
+
+For example:
+```shell
+export TOP=$PWD/TOP
+export CDS_TOP=$PWD/CDS_TOP
+export OS=LINUX
+export VIEW=$PWD
+export SERVICE_SUITE_VERSION=95.0.0
+export WLS_DIR=$PWD/TOP
+```
+
 ## Reference
 The Java Swing application this was based on is documented here: http://viki.ventyx.us.abb.com/confluence/display/YPRPRJ/Bolt+-+The+Fastest+Way+to+Build+a+Server
 
