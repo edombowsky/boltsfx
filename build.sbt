@@ -1,6 +1,6 @@
 organization := "com.abb"
 
-name := "BoltSfx"
+name := "BoltSFx"
 
 version := "0.1-SNAPSHOT"
 
