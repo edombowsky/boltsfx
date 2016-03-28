@@ -13,6 +13,7 @@ libraryDependencies ++= Seq(
   "org.scalafx"                %% "scalafx"             % "8.0.60-R9",
   "org.scalafx"                %% "scalafxml-core-sfx8" % "0.2.2",
   "com.typesafe.scala-logging" %% "scala-logging"       % "3.1.0",
+  "com.github.scopt"           %% "scopt"               % "3.4.0",
   "ch.qos.logback"             %  "logback-classic"     % "1.1.3"
 )
 
@@ -27,3 +28,13 @@ unmanagedJars in Compile += {
   val jh = ps("java.home")
   Attributed.blank(file(jh) / "lib/ext/jfxrt.jar")
 }
+
+// ----- Start of sbt-buildinfo settings
+lazy val root = (project in file(".")).
+  enablePlugins(BuildInfoPlugin).
+  settings(
+    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion, organization),
+    buildInfoPackage := "hello"
+  )
+// ----- End of sbt-buildinfo settings
+

@@ -1,4 +1,4 @@
-package com.abb.bolt
+package com.abb.boltsfx
 
 /**
  * Taken from http://stackoverflow.com/a/33312286/6015856

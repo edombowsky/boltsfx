@@ -42,7 +42,7 @@
  * 15 - JUnit build error
  *
  */
-package com.abb.bolt
+package com.abb.boltsfx
 
 import java.util.Properties
 import java.util.ArrayList
@@ -141,7 +141,7 @@ case class BldServerConfig(
 
 object BldServer {
 
-  private[bolt] class StopWatch {
+  private[boltsfx] class StopWatch {
     private var startTime: Long = 0
     private var stopTime: Long = 0
     private var running: Boolean = false
@@ -555,12 +555,12 @@ class BldServer(val config: BldServerConfig) {
   if (mDropODBUser) println("  * Not dropping ODB user")
 
   // class BldServerException extends Exception {
-  //   private[bolt] def this(msg: String) {
+  //   private[boltsfx] def this(msg: String) {
   //     this()
   //     `super`(msg)
   //   }
 
-  //   private[bolt] def this(msg: String, t: Throwable) {
+  //   private[boltsfx] def this(msg: String, t: Throwable) {
   //     this()
   //     `super`(msg, t)
   //   }
@@ -575,17 +575,17 @@ class BldServer(val config: BldServerConfig) {
     }
   }
 
-  private[bolt] class StreamReader(is: InputStream=null, st: String=null, os: OutputStream=null) extends Thread {
-    // private[bolt] var is: InputStream = null
-    // private[bolt] var st: String = null
-    // private[bolt] var os: OutputStream = null
+  private[boltsfx] class StreamReader(is: InputStream=null, st: String=null, os: OutputStream=null) extends Thread {
+    // private[boltsfx] var is: InputStream = null
+    // private[boltsfx] var st: String = null
+    // private[boltsfx] var os: OutputStream = null
 
-    private[bolt] def this(is: InputStream, st: String) {
+    private[boltsfx] def this(is: InputStream, st: String) {
       // this()
       this(is, st, null)
     }
 
-    // private[bolt] def this(is: InputStream, st: String, redirect: OutputStream) {
+    // private[boltsfx] def this(is: InputStream, st: String, redirect: OutputStream) {
     //   this()
     //   this.is = is
     //   this.st = st
