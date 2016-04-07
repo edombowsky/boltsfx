@@ -75,7 +75,7 @@ class BoltSFxPresenter(
   val bldRuntime = BoltFXML.props.getProperty("bldruntime")
 
   var mDataloaderTemplate = BoltFXML.props.getProperty("dataloadertemplate")
-var EMD = "jjjj"
+
   odbUser match {
     case a: String => odbUserTextField.setText(a)
     case _ => odbUserTextField.setText("")
