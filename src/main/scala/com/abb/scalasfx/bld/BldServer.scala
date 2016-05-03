@@ -1,4 +1,4 @@
-/*
+        /*
  * Copyright (c) 2016 ABB Enterprise Software. All rights reserved.
  *
  * Version 1.0
@@ -71,7 +71,7 @@ import scala.collection.immutable.Map
 
 object BuildStep extends Enumeration {
   type BuildStep = Value
-  
+
   val NONE = Value
   val GET_ID = Value
   val CREATE_ODB_USER = Value
@@ -116,8 +116,8 @@ object PackageStep extends Enumeration {
 import PackageStep._
 
 case class BldServerConfig(
-  user: Option[String] = None, 
-  password: Option[String] = None, 
+  user: Option[String] = None,
+  password: Option[String] = None,
   instance: Option[String] = None,
   uid: Option[Int] = None,
   profileName: Option[String] = None,
@@ -187,7 +187,7 @@ object BldServer {
       .text("ODB instance (e.g. dellr815c_r11203)")
     opt[Int]('u', "uid")
       .action { (x, c) => c.copy(uid = Some(x)) }
-      .validate { x => if (x > 999) success else failure("Invalid uid, must be 3 digits or less") } 
+      .validate { x => if (x > 999) success else failure("Invalid uid, must be 3 digits or less") }
       .text("User id, used for port offsets")
     opt[String]('o', "profile")
       .action { (x, c) => c.copy(profileName = Some(x)) }
@@ -258,14 +258,14 @@ object BldServer {
       .text("Path to store the logs. Default is TOP")
   }
 
-/** 
+/**
   * Parse the command line and perform the specified doAction
   *
   * @param args  the command line arguments
   * @return 0 for success, positive non-zero for failure
   */
 // def doAction(args: Array[String]): Int = {
-  
+
 //   parser.parse(args, BldServerConfig()) match {
 //     case Some(config) =>
 //       println("Starting BldServer with following parameters")
@@ -303,7 +303,7 @@ object BldServer {
 //     }
 //   }
 
-  def main(args: Array[String]) {    
+  def main(args: Array[String]) {
     parser.parse(args, BldServerConfig()) match {
       case Some(config) =>
         println("Starting BldServer")
@@ -311,15 +311,15 @@ object BldServer {
         try {
           val sb: BldServer = new BldServer(config)
           val t: BldServer.StopWatch = new BldServer.StopWatch
-        
+
           t.start
           val rc = sb.start
           t.stop
-        
+
           val elapsed: Long = t.getElapsedTimeSecs
           val mins: Long = elapsed / 60
           val secs: Long = elapsed % 60
-        
+
           println(s"Duration: $mins m $secs s")
           println(s"BldServer return code: $rc")
 
@@ -328,12 +328,12 @@ object BldServer {
         catch {
           case ex: BldServerException => {
             Console.err.println(ex.getMessage)
-            
+
             if (ex.getCause != null) {
               val c: Throwable = ex.getCause
               Console.err.println(c.getMessage)
             }
-            
+
             sys.exit(1)
           }
         }
@@ -348,7 +348,7 @@ object BldServer {
 
 class BldServer(val config: BldServerConfig) {
 
-  // Initialize location of logs for each build step. Not all steps have 
+  // Initialize location of logs for each build step. Not all steps have
   // logs - only include the ones that do.
   private val mBuildLogs: Map[String, String] = Map(
       BuildStep.JAM_EXPORTS.toString     -> "jam",
@@ -464,7 +464,7 @@ class BldServer(val config: BldServerConfig) {
     }
   }
 
-  // First argument to check for is if the -profile argument is set. If so, 
+  // First argument to check for is if the -profile argument is set. If so,
   // then process the profile properties file and ignore the rest of the
   // arguments
   if (config.profileName.isDefined) readProfile(config.profileName.get)
@@ -501,7 +501,7 @@ class BldServer(val config: BldServerConfig) {
     mRunDataLoader = true
   }
 
-  // Short-cut parameter to specify a complete clean code + ODB build, 
+  // Short-cut parameter to specify a complete clean code + ODB build,
   // server setup, and JUnit run.
   if (config.buildJunit) {
     mRunBuild = true
@@ -528,7 +528,7 @@ class BldServer(val config: BldServerConfig) {
   if (mRunBuildODB) println("  * Build ODB")
   if (mRunSetup) {
     if (mRunBldRuntime) println("  * Run BldRuntime")
-    
+
     if (mRunDataLoader) println(s"  * Run DataLoader using template $mDataLoaderTemplate")
   }
   if (mRunJUnit) println("  * Run JUnit")
@@ -540,7 +540,7 @@ class BldServer(val config: BldServerConfig) {
   if (mRunSetup || mRunJUnit || mRunPackage) {
     if (mODBUser != None && mODBPassword != None && mODBInstance != None) {
       val dbConn: String = s"${mODBUser.get}/${mODBPassword.get}@${mODBInstance.get}"
-      
+
       println(s"  * Database: $dbConn")
     }
     else if (mODBInstance != None) {
@@ -621,14 +621,14 @@ class BldServer(val config: BldServerConfig) {
 
   private def deleteDirectory(dir: String) {
     var rc: Int = 0
-    
+
     try {
       mPB = new ProcessBuilder("rm", "-rf", dir)
       mPB.directory(new File(mTOP.get))
       mProc = mPB.start
       mProc.waitFor
       rc = mProc.exitValue
-    
+
       if (rc != 0) Console.err.println(s"Failed to delete directory $dir")
     }
     catch {
@@ -682,36 +682,36 @@ class BldServer(val config: BldServerConfig) {
     if (mID != None) return mID
 
     var id: String = null
- 
+
     try {
       println("here4")
       mPB = new ProcessBuilder("id", "-u")
       mPB.directory(new File(mTOP.get))
- 
+
       println("Obtaining id")
- 
+
       mProc = mPB.start
-      
+
       val input: BufferedReader = new BufferedReader(new InputStreamReader(mProc.getInputStream))
       val err: BufferedReader = new BufferedReader(new InputStreamReader(mProc.getErrorStream))
-      
+
       println("Waiting for id")
-      
+
       mProc.waitFor
-      
+
       val rc: Int = mProc.exitValue
-      
+
       println(s"Exit value ${rc}")
-      
+
       // id = input.readLine
       // println(s"here1: $id")
-      id = "303" 
+      id = "303"
 
       id match {
-        case null => 
+        case null =>
           println("Failed to retrieve id")
           None
-        case id => 
+        case id =>
           println(s"id = $id")
           if (id.length != 3) throw BldServerException(s"uid ($id) must be 3 digits.")
           else mLdapPort = s"17${id}"
@@ -736,51 +736,51 @@ class BldServer(val config: BldServerConfig) {
   }
 
   // This function is not really needed anymore.
-  // When Bolt builds an ODB from source, the rules file will automatically 
+  // When Bolt builds an ODB from source, the rules file will automatically
   // clean the ODB before running the real SQL scripts.
   private def createODBUser: Int = {
     setBuildStep(BuildStep.CREATE_ODB_USER, "Creating ODB User")
-    
+
     var rc: Int = 0
     var conn: Connection = null
-    
+
     try {
       val connectStr: String = getConnectString(mODBInstance.get)
       val driver: String = "oracle.jdbc.OracleDriver"
-    
+
       Class.forName(driver)
-    
+
       val url: String = "jdbc:oracle:thin:@" + connectStr
-    
+
       conn = DriverManager.getConnection(url, "wfm_admin", "wfm_admin")
-    
+
       val st: Statement = conn.createStatement
-    
+
       println("Connected to DB")
-      
-      // generate random number for user ID and password. We'll constrain the 
-      // result set to 10 digits. This algorithm was borrowed from 
+
+      // generate random number for user ID and password. We'll constrain the
+      // result set to 10 digits. This algorithm was borrowed from
       // http://stackoverflow.com/questions/363681/java-generating-random-number-in-a-range
       val max: Double = Math.pow(2, 31) - 1
       val min: Double = 1000000000
       val r: Double = min + (Math.random * (max - min))
       val id: Long = r.round
-      
+
       mODBUser = Some(s"auto_${id}_ODB")
       mODBPassword = mODBUser
-      
+
       println(s"ODB user: ${mODBUser.get}")
       println(s"ODB password: ${mODBPassword.get}")
-      
-      // Now, get wfm_admin to create the user for us. Note that we are not 
+
+      // Now, get wfm_admin to create the user for us. Note that we are not
       // checking for the results here since there is no result set returned
       // by the statement.
       rc = st.executeUpdate(s"create user ${mODBUser.get} identified by ${mODBPassword.get}")
-      
+
       println("Created user.")
-      
+
       rc = st.executeUpdate("begin dropper.recreate_user('" + mODBUser.get.toUpperCase + "', 'ODB_DATA', 'ODB_INDEX', TRUE ); end;")
-      
+
       println("Recreating user")
     }
     catch {
@@ -811,26 +811,26 @@ class BldServer(val config: BldServerConfig) {
 
   private def checkODB: Int = {
     setBuildStep(BuildStep.CHECK_ODB_USER, "Checking ODB connectivity..")
-    
+
     var rc: Int = 0
     var conn: Connection = null
-    
+
     try {
       val connectStr: String = getConnectString(mODBInstance.get)
       val driver: String = "oracle.jdbc.OracleDriver"
-    
+
       Class.forName(driver)
-    
+
       val url: String = "jdbc:oracle:thin:@" + connectStr
-    
+
       conn = DriverManager.getConnection(url, "wfm_admin", "wfm_admin")
-    
+
       val st: Statement = conn.createStatement
-    
+
       println("Connected to DB")
-      
+
       var rs: ResultSet = st.executeQuery(s"select null from dba_users where username = upper('${mODBUser.get}')")
-      
+
       if (!rs.next) {
         println(s"ODB user ${mODBUser.get} does not exist in database ${mODBInstance.get}")
         rc = 1
@@ -839,13 +839,13 @@ class BldServer(val config: BldServerConfig) {
 
       // Check if we have any open sessions
       rs = st.executeQuery(s"select null from v$$session where username = upper('${mODBUser.get}') and status != 'KILLED'")
-      
+
       if (rs.next) {
         println(s"ODB user ${mODBUser.get} still has open connections to database ${mODBInstance.get}")
         rc = 1
         return rc
       }
-      
+
       // Can we log into the ODB account
       try {
         conn = DriverManager.getConnection(url, mODBUser.get, mODBPassword.get)
@@ -856,7 +856,7 @@ class BldServer(val config: BldServerConfig) {
           rc = 1
         }
       }
-      
+
       if (rc == 0) println("ODB user validated.")
 
       rc
@@ -878,7 +878,7 @@ class BldServer(val config: BldServerConfig) {
           }
         }
       }
-      
+
       rc
     }
   }
@@ -886,106 +886,106 @@ class BldServer(val config: BldServerConfig) {
   private def jamExports: Int = {
     setBuildStep(BuildStep.JAM_EXPORTS, "Running jam")
     var rc: Int = 0
-    
+
     try {
       mPB = new ProcessBuilder("jam", "exports")
       mPB.directory(new File(mTOP.get + "/Bld/src"))
-    
+
       println("Starting jam exports from Bld/src")
-    
+
       mProc = mPB.start
-      
+
       val name: Option[String] = mBuildLogs.get(mBuildStep.toString)
-      
+
       name match {
         case Some(name) =>
           var logname: String = s"${mLogPath}/${name}_exports.log"
-          
+
           deleteLog(logname)
-          
+
           var instr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-          
+
           mInputReader = new StreamReader(mProc.getInputStream, "INPUT: ", instr)
-          
+
           var errstr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-          
+
           mErrorReader = new StreamReader(mProc.getErrorStream, "ERROR: ", errstr)
           mInputReader.start
           mErrorReader.start
-          
+
           println("Waiting for jam...")
-          
+
           mProc.waitFor
-          
+
           rc = mProc.exitValue
-          
+
           println(s"jam returned $rc")
-          
+
           if (rc != 0) return rc
 
           mPB = new ProcessBuilder("jam", "idls", "headers")
           mPB.directory(new File(mTOP.get))
-          
+
           println("Starting jam idls headers from TOP")
-          
+
           mProc = mPB.start
           logname = s"${mLogPath}/${name}_headers.log"
           deleteLog(logname)
-          
+
           instr = new java.io.FileOutputStream(logname, true)
-          
+
           mInputReader = new StreamReader(mProc.getInputStream, "INPUT: ", instr)
-          
+
           errstr = new java.io.FileOutputStream(logname, true)
-          
+
           mErrorReader = new StreamReader(mProc.getErrorStream, "ERROR: ", errstr)
-          
+
           mInputReader.start
           mErrorReader.start
-          
+
           println("Waiting for jam...")
-          
+
           mProc.waitFor
           rc = mProc.exitValue
-          
+
           println(s"Jam returned $rc")
-          
+
           if (rc != 0) return rc
-          
+
           mPB = new ProcessBuilder("jam", "exports")
           mPB.directory(new File(mTOP.get))
-          
+
           println("Starting jam exports from TOP")
-          
+
           mProc = mPB.start
           logname = s"{mLogPath}/${name}_exports_from_TOP.log"
           deleteLog(logname)
-          
+
           instr = new java.io.FileOutputStream(logname, true)
-          
+
           mInputReader = new StreamReader(mProc.getInputStream, "INPUT: ", instr)
-          
+
           errstr = new java.io.FileOutputStream(logname, true)
-          
+
           mErrorReader = new StreamReader(mProc.getErrorStream, "ERROR: ", errstr)
-          
+
           mInputReader.start
           mErrorReader.start
-          
+
           println("Waiting for jam exports")
-          
+
           mProc.waitFor
           rc = mProc.exitValue
-          
+
           println(s"Jam returned $rc")
-          
+
           // if (rc != 0) return rc  original line
           rc
 
         case None =>
           println(s"Missing log file name for step ${mBuildStep}")
           1
-      }      
+      }
     }
     catch {
       case ex: java.io.IOException => {
@@ -1006,13 +1006,13 @@ class BldServer(val config: BldServerConfig) {
 
   private def bldDatabase: Int = {
     setBuildStep(BuildStep.BLD_DATABASE, "Running BldDatabase")
-    
+
     var rc: Int = 0
-    
+
     try {
       val conn: String = s"${mODBUser.get}/${mODBPassword.get}@${mODBInstance.get}"
       val args: java.util.ArrayList[String] = new java.util.ArrayList[String]
-    
+
       args.add("perl")
       args.add("BldDatabase.pl")
       args.add("-odb")
@@ -1023,48 +1023,48 @@ class BldServer(val config: BldServerConfig) {
       args.add("odb_data")
       args.add("-oindexspace")
       args.add("odb_index")
-    
+
       var i: Int = 1
-      
+
       import scala.collection.JavaConversions._
-    
+
       for (a <- args) {
         println(s"Arg $i : $a")
         i += 1
       }
-    
+
       mPB = new ProcessBuilder(args)
-      
+
       val toolsDir: String = mTOP.get + "/Bld/src"
-      
+
       mPB.directory(new File(toolsDir))
-      
+
       println("Starting BldDatabase")
-      
+
       mProc = mPB.start
-      
+
       val name: Option[String] = mBuildLogs.get(mBuildStep.toString)
-      
+
       name match {
         case Some(name) =>
           val logname: String = s"${mLogPath}/${name}"
           deleteLog(logname)
-          
+
           val instr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
           mInputReader = new StreamReader(mProc.getInputStream, "INPUT: ", instr)
-          
+
           val errstr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-          
+
           mErrorReader = new StreamReader(mProc.getErrorStream, "ERROR: ", errstr)
-          
+
           mInputReader.start
           mErrorReader.start
-          
+
           println("Waiting for BldDatabase")
-          
+
           mProc.waitFor
           rc = mProc.exitValue
-          
+
           println(s"Exit value $rc")
 
           rc
@@ -1072,7 +1072,7 @@ class BldServer(val config: BldServerConfig) {
         case None =>
           println(s"Missing log file name for step ${mBuildStep}")
           1
-      }      
+      }
     }
     catch {
       case ex: java.io.IOException => {
@@ -1093,40 +1093,40 @@ class BldServer(val config: BldServerConfig) {
 
   private def vssbuildclean: Int = {
     setBuildStep(BuildStep.VSS_BUILD_CLEAN, "Running vss_build clean")
-    
+
     var rc: Int = 0
-    
+
     try {
       mPB = new ProcessBuilder("vss_build", "clean", "-logpath", mLogPath)
       mPB.directory(new File(mTOP.get))
-    
+
       println("Starting vss_build clean")
-      
+
       mProc = mPB.start
-      
+
       val name: Option[String] = mBuildLogs.get(mBuildStep.toString)
 
       name match {
         case Some(name) =>
           val logname: String = s"${mLogPath}/${name}"
           deleteLog(logname)
-          
+
           val instr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-          
+
           mInputReader = new StreamReader(mProc.getInputStream, "INPUT: ", instr)
-          
+
           val errstr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-          
+
           mErrorReader = new StreamReader(mProc.getErrorStream, "ERROR: ", errstr)
-          
+
           mInputReader.start
           mErrorReader.start
-          
+
           println("Waiting for vss_build clean")
-          
+
           mProc.waitFor
           rc = mProc.exitValue
-          
+
           println(s"Exit value $rc")
 
           rc
@@ -1155,10 +1155,10 @@ class BldServer(val config: BldServerConfig) {
 
   private def vssbuild: Int = {
     setBuildStep(BuildStep.VSS_BUILD, "Running vss_build")
-    
+
     var db: Boolean = false
     var rc: Int = 0
-   
+
     try {
       if (mODBUser != None && mODBPassword != None && mODBInstance != None && mRunBuildODB) {
         db = true
@@ -1168,36 +1168,36 @@ class BldServer(val config: BldServerConfig) {
       else {
         mPB = new ProcessBuilder("vss_build", "-jam", "-j6", "-log", "exports", "-logpath", mLogPath)
       }
-   
+
       mPB.directory(new File(mTOP.get))
-   
+
       println("Starting vss_build exports")
-      
+
       mProc = mPB.start
-      
+
       val name: Option[String] = mBuildLogs.get(mBuildStep.toString)
-      
+
       name match {
         case Some(name) =>
           val logname: String = s"${mLogPath}/${name}"
           deleteLog(logname)
-          
+
           val instr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-       
+
           mInputReader = new StreamReader(mProc.getInputStream, "INPUT: ", instr)
-         
+
           val errstr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-       
+
           mErrorReader = new StreamReader(mProc.getErrorStream, "ERROR: ", errstr)
-       
+
           mInputReader.start
           mErrorReader.start
-         
+
           println("Waiting for vss_build")
-          
+
           mProc.waitFor
           rc = mProc.exitValue
-          
+
           println(s"Exit value $rc")
           rc
 
@@ -1226,31 +1226,31 @@ class BldServer(val config: BldServerConfig) {
 
   private def loadJavaPrivileges: Int = {
     setBuildStep(BuildStep.LOAD_PRIVILEGES, "Granting Java Privileges")
-    
+
     var rc: Int = 0
     var conn: Connection = null
-    
+
     try {
       val connectStr: String = getConnectString(mODBInstance.get)
       val driver: String = "oracle.jdbc.OracleDriver"
-    
+
       Class.forName(driver)
-    
+
       val url: String = s"jdbc:oracle:thin:@${connectStr}"
-    
+
       conn = DriverManager.getConnection(url, "wfm_admin", "wfm_admin")
-    
+
       val st: Statement = conn.createStatement
-    
+
       println("Connected to DB")
-      
+
       val stmt1 = s"begin grant_java_privilege('${mODBUser.get}', '${mHostName}', ${mLdapPort}); end;"
       val stmt2 = s"begin dbms_java.grant_permission('${mODBUser.get.toUpperCase}', 'SYS:java.security.SecurityPermission','putProviderProperty.SunJSSE', ''); end;"
       println(s"STMT1: $stmt1")
       println(s"STMT2: $stmt2")
       rc = st.executeUpdate(stmt1)
       rc = st.executeUpdate(stmt2)
-      
+
       println("Privileges granted.")
       rc
     }
@@ -1276,7 +1276,7 @@ class BldServer(val config: BldServerConfig) {
         }
       }
     }
-    
+
     0
   }
 
@@ -1286,13 +1286,13 @@ class BldServer(val config: BldServerConfig) {
     // Ensure that LDAP is fully shut-down before running BldRuntime. This will
     // cause failures if LDAP and SVN are still running.
     stopLdapHelper
-    
+
     var rc: Int = 0
-    
+
     try {
       // Create the temp directory if it does not exist. Required for LDAP build.
       val tdir: File = new File(mTOP.get + "/temp")
-    
+
       if (!tdir.exists) {
         if (!tdir.mkdir) {
           Console.err.println("Failed to make TOP/temp directory")
@@ -1300,25 +1300,25 @@ class BldServer(val config: BldServerConfig) {
           return rc
         }
       }
-    
+
       println("Starting BldBoltRuntime")
-      
+
       val wlsDir: String = System.getenv("WLS_DIR")
-      
+
       if (wlsDir == null || wlsDir.isEmpty) {
         Console.err.println("WLS_DIR not set!")
         return 1
       }
-      
+
       val cdsTop: String = System.getenv("CDS_TOP")
-      
+
       if (cdsTop == null || cdsTop.isEmpty) {
         Console.err.println("CDS_TOP not set!")
         return 1
       }
-      
+
       val args: java.util.ArrayList[String] = new java.util.ArrayList[String]
-      
+
       args.add("BldBoltRuntime")
       args.add("-verbose")
       args.add("act=" + user)
@@ -1326,61 +1326,61 @@ class BldServer(val config: BldServerConfig) {
       args.add("oracle=" + odbinstance)
       args.add("wls_dir=" + wlsDir)
       args.add("cds_top=" + cdsTop)
-      
+
       if (mID != None) args.add(s"id=${mID.get}")
 
       val tmp: Option[String] = config.buildRuntime
-      
+
       if (tmp != None) {
         var temp = tmp.get
         val start: Int = temp.indexOf('"')
         val end: Int = temp.lastIndexOf('"')
-      
+
         if (start != -1 && end != -1 && (start + 1) != end) {
           temp = temp.substring(start + 1, end)
         }
-      
+
         val bldRuntimeArgs: Array[String] = temp.split(" ")
         for (b <- bldRuntimeArgs) {
           args.add(b)
         }
       }
-      
+
       var i: Int = 1
-      
+
       import scala.collection.JavaConversions._
-      
+
       for (a <- args) {
         System.out.println("Arg " + i + ": " + a)
         i += 1
       }
-      
+
       mPB = new ProcessBuilder(args)
-      
+
       val toolsDir: String = s"${mTOP.get}/${mOS.get}/tools"
       mPB.directory(new File(toolsDir))
       mProc = mPB.start
-      
-      val name: Option[String] = mBuildLogs.get(mBuildStep.toString) 
-      
+
+      val name: Option[String] = mBuildLogs.get(mBuildStep.toString)
+
       name match{
         case Some(name) =>
           val logname: String = s"${mLogPath}/${name}"
           deleteLog(logname)
-          
+
           val instr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
           mInputReader = new StreamReader(mProc.getInputStream, "INPUT: ", instr)
-          
+
           val errstr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
           mErrorReader = new StreamReader(mProc.getErrorStream, "ERROR: ", errstr)
           mInputReader.start
           mErrorReader.start
-          
+
           println("Waiting for BldBoltRuntime")
-          
+
           mProc.waitFor
           rc = mProc.exitValue
-          
+
           println(s"Exit value $rc")
           rc
 
@@ -1415,42 +1415,42 @@ class BldServer(val config: BldServerConfig) {
   private def moveDirectories: Int = {
     setBuildStep(BuildStep.MOVE_DIRS, "Moving Directories")
     var rc: Int = 0
-    
+
     try {
       mPB = new ProcessBuilder("BldSetupDir")
       mPB.directory(new File(s"${mTOP.get}/${mOS.get}/tools"))
-    
+
       println("Moving bin, etc, logs directories...")
-      
+
       mProc = mPB.start
-      
+
       val name: Option[String] = mBuildLogs.get(mBuildStep.toString)
-      
+
       name match {
         case Some(name) =>
           val logname: String = mLogPath + "/" + name
           val log: File = new File(logname)
-          
+
           if (log.exists) {
             println("Deleting old log")
             log.delete
           }
-          
+
           val instr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-          
+
           mInputReader = new StreamReader(mProc.getInputStream, "INPUT: ", instr)
-          
+
           val errstr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-          
+
           mErrorReader = new StreamReader(mProc.getErrorStream, "ERROR: ", errstr)
           mInputReader.start
           mErrorReader.start
-          
+
           println("Waiting for BldSetupDir")
-          
+
           mProc.waitFor
           rc = mProc.exitValue
-          
+
           println(s"Exit value $rc")
           rc
 
@@ -1458,7 +1458,7 @@ class BldServer(val config: BldServerConfig) {
           println(s"Missing log file name for step ${mBuildStep}")
           1
       }
-      
+
     }
     catch {
       case ex: java.io.IOException => {
@@ -1478,7 +1478,7 @@ class BldServer(val config: BldServerConfig) {
 
   private def getConnectString(dbStr: String): String = {
     var retval: String = null
-    
+
     try {
       val p: Process = Runtime.getRuntime.exec("tnsping " + dbStr)
       val input: java.io.BufferedReader = new java.io.BufferedReader(new java.io.InputStreamReader(p.getInputStream))
@@ -1496,27 +1496,27 @@ class BldServer(val config: BldServerConfig) {
         println("IOException connecting to database: " + ex)
       }
     }
-    
+
     retval
   }
 
   private def loadCompose: Int = {
     setBuildStep(BuildStep.LOAD_COMPOSE, "Running fake Compose deployment")
-    
+
     val filename: String = s"${mTOP.get}/Dl/src/DataLoader/dl_compose.sql"
     var dlCompose: String = new String
-    
+
     try {
       val input: BufferedReader = new BufferedReader(new java.io.FileReader(filename))
       var line: String = null
-    
+
       while ((({ line = input.readLine; line })) != null) {
         if (!line.startsWith("/")) {
           dlCompose += line
           dlCompose += "\n"
         }
       }
-      
+
       input.close
     }
     catch {
@@ -1528,24 +1528,24 @@ class BldServer(val config: BldServerConfig) {
 
     var conn: Connection = null
     var rc: Int = 0
-   
+
     try {
       val connectStr: String = getConnectString(mODBInstance.get)
       val driver: String = "oracle.jdbc.OracleDriver"
-   
+
       Class.forName(driver)
-   
+
       val url: String = "jdbc:oracle:thin:@" + connectStr
-   
+
       conn = DriverManager.getConnection(url, mODBUser.get, mODBPassword.get)
-   
+
       val st: Statement = conn.createStatement
-   
+
       println("Connected to DB")
       println(s"Running ${filename}")
-      
+
       rc = st.executeUpdate(dlCompose)
-      
+
       println("Finished")
     }
     catch {
@@ -1570,26 +1570,26 @@ class BldServer(val config: BldServerConfig) {
         }
       }
     }
-    
+
     0
   }
 
   private def startLdap: Int = {
     setBuildStep(BuildStep.START_LDAP, "Starting LDAP")
-    
+
     var rc: Int = 0
-    
+
     try {
       mPB = new ProcessBuilder("StartLdap")
       mPB.directory(new File(s"${mTOP.get}/${mOS.get}/bin"))
-    
+
       println("Starting LDAP")
-      
+
       mLdapProc = mPB.start
-      
+
       val input: BufferedReader = new BufferedReader(new InputStreamReader(mLdapProc.getInputStream))
       val err: BufferedReader = new BufferedReader(new InputStreamReader(mLdapProc.getErrorStream))
-      
+
       // Wait for LDAP to fully start before continuing
       Thread.sleep(5000)
 
@@ -1609,15 +1609,15 @@ class BldServer(val config: BldServerConfig) {
 
   private def killProcess(pid: Int) {
     try {
-      
+
       val pb: ProcessBuilder = new ProcessBuilder("kill", String.valueOf(pid))
-      
+
       pb.directory(new File(s"${mTOP.get}/${mOS.get}/bin"))
-      
+
       val proc: Process = pb.start
       val input: BufferedReader = new BufferedReader(new InputStreamReader(proc.getInputStream))
       val err: BufferedReader = new BufferedReader(new InputStreamReader(proc.getErrorStream))
-      
+
       proc.waitFor
       Thread.sleep(5000)
       proc.destroy
@@ -1635,24 +1635,24 @@ class BldServer(val config: BldServerConfig) {
   private def stopSlapd {
     try {
       val cmd: String = "ps -fu " + mUserName + " | grep slapd | grep -v grep | awk '{print \\$2}'"
-      
+
       mPB = new ProcessBuilder("/bin/ksh", "-c", cmd)
-      
+
       println("Stopping slapd...")
-      
+
       mProc = mPB.start
-      
+
       val input: BufferedReader = new BufferedReader(new InputStreamReader(mProc.getInputStream))
       val err: BufferedReader = new BufferedReader(new InputStreamReader(mProc.getErrorStream))
-      
+
       mProc.waitFor
-      
+
       var pid: Int = -1
       var line: String = null
-      
+
       while ((({ line = input.readLine; line })) != null) {
         val pidstr: String = line.trim
-        
+
         try {
           pid = pidstr.toInt
         }
@@ -1662,7 +1662,7 @@ class BldServer(val config: BldServerConfig) {
             // continue //TODO: continue is not supported
           }
         }
-        
+
         println("Stopping slapd, pid = " + pid)
         killProcess(pid)
       }
@@ -1682,14 +1682,14 @@ class BldServer(val config: BldServerConfig) {
     try {
       mPB = new ProcessBuilder("StopSvn")
       mPB.directory(new File(s"${mTOP.get}/${mOS.get}/bin"))
-      
+
       println("Stopping SVN...")
-      
+
       mProc = mPB.start
-      
+
       val input: BufferedReader = new BufferedReader(new InputStreamReader(mProc.getInputStream))
       val err: BufferedReader = new BufferedReader(new InputStreamReader(mProc.getErrorStream))
-      
+
       mProc.waitFor
     }
     catch {
@@ -1704,39 +1704,39 @@ class BldServer(val config: BldServerConfig) {
 
   /**
    * Finds the LDAP processes and stops them
-   * 
+   *
    * @return 0 for success, non-zero otherwise
    */
   private def stopLdapHelper: Int = {
     var rc: Int = 0
     var found: Boolean = false
-    
+
     // Try a graceful shut-down first, as this will shut-down the LDAP and SVN processes
     try {
       mPB = new ProcessBuilder("ps", "-fu", mUserName)
       mPB.directory(new File(s"${mTOP.get}/${mOS.get}/bin"))
-    
+
       println("Getting StartLdap PID...")
-      
+
       mProc = mPB.start
       val input: BufferedReader = new BufferedReader(new InputStreamReader(mProc.getInputStream))
       val err: BufferedReader = new BufferedReader(new InputStreamReader(mProc.getErrorStream))
-      
+
       mProc.waitFor
-      
+
       var pid: Int = -1
       var line: String = null
-    
+
       // The process list needs to be scanned for the string StartLdap.
-      // While not fool proof, it will suffice for internal use.  
+      // While not fool proof, it will suffice for internal use.
       while ((({ line = input.readLine; line })) != null) {
         line = line.trim
-      
+
         if (line.contains(" StartLdap") || line.contains(" slapd")) {
           val splitLine: Array[String] = line.split("\\s+")
           // PID is the second argument after the fist space
           val pidstr: String = splitLine(1)
-          
+
           try {
             pid = pidstr.toInt
           }
@@ -1752,7 +1752,7 @@ class BldServer(val config: BldServerConfig) {
           killProcess(pid)
         }
       }
-      
+
       input.close
 
       rc
@@ -1770,7 +1770,7 @@ class BldServer(val config: BldServerConfig) {
         stopSvn
       }
 
-      // Ungraceful shut-down of the process. Hopefully, LDAP is already 
+      // Ungraceful shut-down of the process. Hopefully, LDAP is already
       // shut-down from the previous step. If not, there is a possibility
       // the process will still linger.
       if (mLdapProc != null) {
@@ -1788,7 +1788,7 @@ class BldServer(val config: BldServerConfig) {
 
   private def dataLoader: Int = {
     setBuildStep(BuildStep.DATA_LOADER, "Running Dataloader")
-    
+
     var rc: Int = 0
 
     try {
@@ -1798,33 +1798,33 @@ class BldServer(val config: BldServerConfig) {
       mPB.directory(new File(mTOP.get + "/Dl/src/DataLoader/dist"))
 
       println("Starting Dataloader")
-      
+
       mProc = mPB.start
-      
+
       val name: Option[String] = mBuildLogs.get(mBuildStep.toString)
-      
+
       name match {
         case Some(name) =>
           val logname: String = mLogPath + "/" + name
           val log: File = new File(logname)
-          
+
           if (log.exists) {
             println("Deleting old log")
             log.delete
           }
 
           val instr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-          
+
           mInputReader = new StreamReader(mProc.getInputStream, "INPUT: ", instr)
-          
+
           val errstr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-          
+
           mErrorReader = new StreamReader(mProc.getErrorStream, "ERROR: ", errstr)
           mInputReader.start
           mErrorReader.start
-          
+
           println("Waiting for Dataloader")
-          
+
           mProc.waitFor
           rc = mProc.exitValue
           println(s"Exit value ${rc}")
@@ -1855,28 +1855,28 @@ class BldServer(val config: BldServerConfig) {
 
   private def postDataLoader: Int = {
     setBuildStep(BuildStep.POST_DATA_LOADER, "Running post DataLoader script")
-    
+
     val filename: String = mTOP.get + "/Dl/src/DataLoader/postDataLoaderPreJunit.sql"
         val f: File = new File(filename)
-    
+
     if (!f.exists) {
       println(s"No $filename . Skipping step...")
       return 0
     }
-    
+
     var postdl: String = new String
-    
+
     try {
       val input: BufferedReader = new BufferedReader(new java.io.FileReader(filename))
       var line: String = null
-    
+
       while ((({ line = input.readLine; line })) != null) {
         if (!line.startsWith("/")) {
           postdl += line
           postdl += "\n"
         }
       }
-      
+
       input.close
     }
     catch {
@@ -1885,26 +1885,26 @@ class BldServer(val config: BldServerConfig) {
         return 1
       }
     }
-    
+
     var conn: Connection = null
-    
+
     try {
       val connectStr: String = getConnectString(mODBInstance.get)
       val driver: String = "oracle.jdbc.OracleDriver"
-    
+
       Class.forName(driver)
-    
+
       val url: String = "jdbc:oracle:thin:@" + connectStr
-    
+
       conn = DriverManager.getConnection(url, mODBUser.get, mODBPassword.get)
-    
+
       val st: Statement = conn.createStatement
-    
+
       println("Connected to DB")
       println(s"Running ${filename}")
-      
+
       st.executeUpdate(postdl)
-      
+
       println("Finished")
     }
     catch {
@@ -1934,29 +1934,29 @@ class BldServer(val config: BldServerConfig) {
 
   private def systemID: Int = {
     setBuildStep(BuildStep.SYSTEM_ID, "Loading SystemID")
-    
+
     println(s"Setting SystemID to ${mUserName}")
-    
+
     var conn: Connection = null
-    
+
     try {
       val connectStr: String = getConnectString(mODBInstance.get)
       val driver: String = "oracle.jdbc.OracleDriver"
-    
+
       Class.forName(driver)
-    
+
       val url: String = s"jdbc:oracle:thin:@${connectStr}"
-    
+
       conn = DriverManager.getConnection(url, mODBUser.get, mODBPassword.get)
-    
+
       val st: Statement = conn.createStatement
-    
+
       println("Connected to DB")
-      
+
       val stmt: String = s"begin meta_reg.upsert_entry( '/System/Advantex/SystemID','text','${mUserName}'); end;"
       println(s"Update registry with: ${stmt}")
       val rc: Int = st.executeUpdate(stmt)
-      
+
       if (rc != 1) {
         Console.err.println("Failed to set system ID!")
         return 1
@@ -1995,12 +1995,12 @@ class BldServer(val config: BldServerConfig) {
     try {
       mPB = new ProcessBuilder("perl", "BldWlsTest.pl", "-junit")
       mPB.directory(new File(mTOP.get + "/weblogic/tools"))
-      
+
       println("Starting junit")
       mProc = mPB.start
-      
+
       val name: Option[String] = mBuildLogs.get(mBuildStep.toString)
-      
+
       if (name == null) {
         println(s"Missing log file name for step $mBuildStep")
         return 1
@@ -2008,27 +2008,27 @@ class BldServer(val config: BldServerConfig) {
 
       val logname: String = mLogPath + "/" + name
       val log: File = new File(logname)
-      
+
       if (log.exists) {
         println("Deleting old log")
         log.delete
       }
 
       val instr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-      
+
       mInputReader = new StreamReader(mProc.getInputStream, "INPUT: ", instr)
-      
+
       val errstr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-      
+
       mErrorReader = new StreamReader(mProc.getErrorStream, "ERROR: ", errstr)
       mInputReader.start
       mErrorReader.start
-      
+
       println("Waiting for junit")
-      
+
       mProc.waitFor
       rc = mProc.exitValue
-      
+
       val report: String = new Scanner(new File(logname), "UTF-8").useDelimiter("\\A").next
       var p: java.util.regex.Pattern = java.util.regex.Pattern.compile("BUILD FAILED")
       var m: java.util.regex.Matcher = p.matcher(report)
@@ -2043,7 +2043,7 @@ class BldServer(val config: BldServerConfig) {
         p = java.util.regex.Pattern.compile("\\[junit\\].*FAILED")
         m = p.matcher(report)
         fail = m.find
-      
+
         if (fail) {
           println("Found JUnit failures.")
           rc = 1
@@ -2054,13 +2054,13 @@ class BldServer(val config: BldServerConfig) {
         p = java.util.regex.Pattern.compile("\\[javac\\]\\s+\\[^N]|Could not create task")
         m = p.matcher(report)
         fail = m.find
-      
+
         if (fail) {
           println("Found JUnit errors.")
           rc = 1
         }
       }
-      
+
       if (!fail) {
         println("JUnit passed!")
       }
@@ -2082,7 +2082,7 @@ class BldServer(val config: BldServerConfig) {
     } finally {
       // 15 means that the JUnit buiuld failed ao there is no report
       if (rc != 15) copyFile("junit-noframes.html", mTOP.get + "/Java/Test/ServicePojoTest/build/test/report", mLogPath)
-      
+
       println("Exit value " + rc)
       rc
     }
@@ -2090,63 +2090,63 @@ class BldServer(val config: BldServerConfig) {
 
   private def findBugs: Int = {
     setBuildStep(BuildStep.FINDBUGS, "Running FindBugs")
-    
+
     var rc: Int = 0
-    
+
     try {
       mPB = new ProcessBuilder("perl", "BldWlsAnalysis.pl", "-findbugs")
       mPB.directory(new File(mTOP + "/weblogic/tools"))
-    
+
       println("Starting FindBugs")
-      
+
       mProc = mPB.start
-      
+
       val name: Option[String] = mBuildLogs.get(mBuildStep.toString)
-      
+
       name match {
         case Some(name) =>
           val logname: String = mLogPath + "/" + name
           val log: File = new File(logname)
-          
+
           if (log.exists) {
             println("Deleting old log")
             log.delete
           }
-          
+
           val instr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-          
+
           mInputReader = new StreamReader(mProc.getInputStream, "INPUT: ", instr)
-          
+
           val errstr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-          
+
           mErrorReader = new StreamReader(mProc.getErrorStream, "ERROR: ", errstr)
-          
+
           mInputReader.start
           mErrorReader.start
-          
+
           println("Waiting for FindBugs")
-          
+
           mProc.waitFor
           rc = mProc.exitValue
-          
+
           var report: String = new java.util.Scanner(new java.io.File(logname), "UTF-8").useDelimiter("\\A").next
           var p: java.util.regex.Pattern = java.util.regex.Pattern.compile("BUILD FAILED")
           var m: java.util.regex.Matcher = p.matcher(report)
           val fail: Boolean = m.find
-          
+
           if (fail) {
             println("Found FindBugs failures.")
             rc = 1
             return rc
           }
-          
+
           val r: File = new File(mTOP + "/Java/findbugs-result.xml")
-          
+
           if (r.exists) {
             report = new Scanner(r, "UTF-8").useDelimiter("\\A").next
             p = Pattern.compile(".*total_bugs=\"0\".*")
             m = p.matcher(report)
-          
+
             if (!m.find) {
               println("FindBugs found bugs!")
               rc = 1
@@ -2158,14 +2158,14 @@ class BldServer(val config: BldServerConfig) {
             rc = 1
             return rc
           }
-          
+
           println("FindBugs passed!")
           rc
 
         case None =>
           println(s"Missing log file name for step $mBuildStep")
           1
-      }      
+      }
     }
     catch {
       case ex: java.io.IOException => {
@@ -2188,28 +2188,28 @@ class BldServer(val config: BldServerConfig) {
 
   private def dropDatabase: Int = {
     mBuildStep = BuildStep.DROP_ODB_USER
-    
+
     var conn: Connection = null
     var rc: Int = 0
-    
+
     try {
       val connectStr: String = getConnectString(mODBInstance.get)
       val driver: String = "oracle.jdbc.OracleDriver"
       Class.forName(driver)
-    
+
       val url: String = "jdbc:oracle:thin:@" + connectStr
-    
+
       conn = DriverManager.getConnection(url, "wfm_admin", "wfm_admin")
-    
+
       val st: Statement = conn.createStatement
-    
+
       println("Dropping ODB user")
-      
+
       // FIXME: put back the proper commands
       rc = st.executeUpdate("declare v_date varchar2(100); begin select sysdate into v_date from dual; end;")
       // rc = st.executeUpdate("begin wfm_dropper.dropper.recreate_user('" + mODBUser.toUpperCase + "', 'ODB_DATA', 'ODB_INDEX', TRUE ); end;")
       // rc = st.executeUpdate("begin execute immediate 'DROP USER " + mODBUser.toUpperCase + " CASCADE'; end;")
-      
+
       println("User dropped.")
       rc
     }
@@ -2235,28 +2235,28 @@ class BldServer(val config: BldServerConfig) {
         }
       }
     }
-    
+
     0
   }
 
   private def copyDir(sourceDir: String, workingDir: String): Int = {
     var rc: Int = 0
-    
+
     if (mLogPath == mTOP) return rc
-    
+
     try {
       mPB = new ProcessBuilder("cp", "-r", sourceDir, mLogPath)
       mPB.directory(new File(workingDir))
-    
+
       println(s"Copying $sourceDir Directory")
-      
+
       mProc = mPB.start
-      
+
       val input: java.io.BufferedReader = new java.io.BufferedReader(new java.io.InputStreamReader(mProc.getInputStream))
       val err: java.io.BufferedReader = new java.io.BufferedReader(new java.io.InputStreamReader(mProc.getErrorStream))
-      
+
       mProc.waitFor
-      
+
       rc = mProc.exitValue
       rc
     }
@@ -2278,22 +2278,22 @@ class BldServer(val config: BldServerConfig) {
 
   private def copyFile(filename: String, sourceDir: String, destDir: String): Int = {
     var rc: Int = 0
-    
+
     if (mLogPath == mTOP) return rc
-    
+
     try {
       mPB = new ProcessBuilder("cp", filename, destDir)
       mPB.directory(new File(sourceDir))
-    
+
       println(s"Copying $filename")
-      
+
       mProc = mPB.start
-      
+
       val input: java.io.BufferedReader = new java.io.BufferedReader(new java.io.InputStreamReader(mProc.getInputStream))
       val err: java.io.BufferedReader = new java.io.BufferedReader(new java.io.InputStreamReader(mProc.getErrorStream))
-      
+
       mProc.waitFor
-      
+
       rc = mProc.exitValue
       rc
     }
@@ -2315,31 +2315,31 @@ class BldServer(val config: BldServerConfig) {
 
   private def getStartEnv: Int = {
     setPackageStep(PackageStep.START_ENV, "Detecting current ODB user")
-    
+
     var rc: Int = 0
-    
+
     try {
       mPB = new ProcessBuilder("StartEnv", "-verbose")
       mPB.directory(new File(s"${mTOP.get}/${mOS.get}/bin"))
-    
+
       println("Starting StartEnv")
       mProc = mPB.start
-      
+
       val input: java.io.BufferedReader = new java.io.BufferedReader(new java.io.InputStreamReader(mProc.getInputStream))
       val err: java.io.BufferedReader = new java.io.BufferedReader(new java.io.InputStreamReader(mProc.getErrorStream))
-      
+
       println("Waiting for StartEnv")
-      
+
       mProc.waitFor
       rc = mProc.exitValue
-      
+
       println(s"Exit value $rc")
-      
+
       var line: String = input.readLine
-      
+
       while (line != null) {
         var i: Int = line.indexOf("dbInstance=")
-      
+
         if (i != -1) mODBInstance = Some(line.substring(i + 11))
 
         i = line.indexOf("dbUser=")
@@ -2386,37 +2386,37 @@ class BldServer(val config: BldServerConfig) {
       mPB.directory(new File(mTOP.get))
 
       println("Starting vss_build release")
-      
+
       mProc = mPB.start
-      
+
       val name: Option[String] = mPackageLogs.get(mPackageStep.toString)
-      
+
       name match {
         case Some(name) =>
           val logname: String = s"${mLogPath}/${name}"
           val log: File = new File(logname)
-          
+
           if (log.exists) {
             println("Deleting old log")
             log.delete
           }
-          
+
           val instr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-          
+
           mInputReader = new StreamReader(mProc.getInputStream, "INPUT: ", instr)
-          
+
           val errstr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-          
+
           mErrorReader = new StreamReader(mProc.getErrorStream, "ERROR: ", errstr)
           mInputReader.start
           mErrorReader.start
-          
+
           println("Waiting for vss_build")
-          
+
           mProc.waitFor
-          
+
           rc = mProc.exitValue
-          
+
           println(s"Exit value $rc")
           rc
 
@@ -2438,49 +2438,49 @@ class BldServer(val config: BldServerConfig) {
         rc
       }
     } finally {
-      
+
       rc
     }
   }
 
   private def jamRelease: Int = {
     setPackageStep(PackageStep.JAM_RELEASE, "Running jam release")
-    
+
     var rc: Int = 0
-    
+
     try {
       mPB = new ProcessBuilder("jam", "release")
       mPB.directory(new File(mTOP.get))
-    
+
       println("Starting jam release")
-      
+
       mProc = mPB.start
-      
+
       val name: Option[String] = mPackageLogs.get(mPackageStep.toString)
-      
+
       name match {
         case Some(name) =>
           val logname: String = s"${mLogPath}/${name}"
-      
+
           deleteLog(logname)
-          
+
           val instr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-          
+
           mInputReader = new StreamReader(mProc.getInputStream, "INPUT: ", instr)
-          
+
           val errstr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-          
+
           mErrorReader = new StreamReader(mProc.getErrorStream, "ERROR: ", errstr)
           mInputReader.start
           mErrorReader.start
-          
+
           println("Waiting for jam...")
-          
+
           mProc.waitFor
           rc = mProc.exitValue
-          
+
           println("jam returned " + rc)
-          
+
           if (rc != 0) return rc
           rc
 
@@ -2502,23 +2502,23 @@ class BldServer(val config: BldServerConfig) {
         rc
       }
     } finally {
-      
+
       rc
     }
   }
 
   private def pkgAll: Int = {
     setPackageStep(PackageStep.PKG_ALL, "Running pkg_all")
-    
+
     var rc: Int = 0
-    
+
     try {
       val pkgArgs: java.util.ArrayList[String] = new java.util.ArrayList[String]
       val dbString: String = s"${mODBUser.get}/${mODBPassword.get}@${mODBInstance.get}"
-    
+
       pkgArgs.add("pkg_all")
       pkgArgs.add(dbString)
-    
+
       if (mPackagePath != null) pkgArgs.add(s"$mPackagePath/DVD_Images")
 
       val tmp: Option[String] = config.pkg
@@ -2527,7 +2527,7 @@ class BldServer(val config: BldServerConfig) {
         var temp = tmp.get
         val start: Int = temp.indexOf('"')
         val end: Int = temp.lastIndexOf('"')
-        
+
         if (start != -1 && end != -1 && (start + 1) != end) temp = temp.substring(start + 1, end)
 
         val args: Array[String] = temp.split(" ")
@@ -2536,58 +2536,58 @@ class BldServer(val config: BldServerConfig) {
           pkgArgs.add(a)
         }
       }
-      
+
       if (!mRunPackageVM) {
         pkgArgs.add("-noVM")
         pkgArgs.add("-noSOI")
         pkgArgs.add("-noMobile")
       }
-      
+
       var  i: Int = 1
-      
+
       import scala.collection.JavaConversions._
-      
+
       for (e <- pkgArgs) {
         println(s"Arg $i : $e")
         i += 1
       }
-      
+
       mPB = new ProcessBuilder(pkgArgs)
       mPB.directory(new File(mTOP + "/Inst/src"))
-      
+
       println("Starting pkg_all")
-      
+
       mProc = mPB.start
-      
+
       val name: Option[String] = mPackageLogs.get(mPackageStep.toString)
-      
+
       name match {
         case Some(name) =>
           val logname: String = mLogPath + "/" + name
           val log: File = new File(logname)
-          
+
           if (log.exists) {
             println("Deleting old log")
             log.delete
           }
-          
+
           val instr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-          
+
           mInputReader = new StreamReader(mProc.getInputStream, "INPUT: ", instr)
-          
+
           val errstr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-          
+
           mErrorReader = new StreamReader(mProc.getErrorStream, "ERROR: ", errstr)
-          
+
           mInputReader.start
           mErrorReader.start
-          
+
           println("Waiting for pkg_all")
-          
+
           mProc.waitFor
-          
+
           rc = mProc.exitValue
-          
+
           println(s"Exit value $rc")
           rc
 
@@ -2609,33 +2609,33 @@ class BldServer(val config: BldServerConfig) {
         rc
       }
     } finally {
-      
+
       rc
     }
   }
 
   private def pkgAppliance: Int = {
     setPackageStep(PackageStep.PKG_APPLIANCE, "Running pkg_appliance")
-    
+
     if (!(mOS == "LINUX")) {
       println(s"Skipping VM packaging for OS ${mOS.get}")
       return 0
     }
-    
+
     var rc: Int = 0
-    
+
     try {
       // Make the working directory first (under tyhe main packaging directory)
       val workingDir: String = mPackagePath + "/tmp"
       val dir: File = new File(workingDir)
-      
+
       if (!dir.exists) {
         if (!dir.mkdir) {
           Console.err.println(s"Failed to make working directory $workingDir")
           return 1
         }
       }
-      
+
       // Set directory to be writable by anyone (required for vssrt)
       dir.setWritable(true, false)
 
@@ -2644,7 +2644,7 @@ class BldServer(val config: BldServerConfig) {
       copyFile("pkg_common", mTOP + "/Inst/src", mPackagePath)
       copyFile("pkg_sysmon", mTOP + "/Inst/src", mPackagePath)
 
-      // Copy EsxTools jar file to packaging directory. We will need it later 
+      // Copy EsxTools jar file to packaging directory. We will need it later
       // to load the .ova file into the ESX server
       copyFile("EsxTools-1.0.jar", mTOP + "/weblogic/tools", mPackagePath)
 
@@ -2652,9 +2652,9 @@ class BldServer(val config: BldServerConfig) {
       // to configure the VM Appliance.
       copyFile("WebConfigCli.jar", mTOP + "/weblogic/tools", mPackagePath)
       copyFile("Logging.jar", mTOP + "/weblogic/dist", mPackagePath)
-      
+
       val pkgAppliance: java.util.ArrayList[String] = new java.util.ArrayList[String]
-      
+
       pkgAppliance.add("ssh")
       pkgAppliance.add("-t")
       pkgAppliance.add("-t")
@@ -2673,52 +2673,52 @@ class BldServer(val config: BldServerConfig) {
       pkgAppliance.add("-u")
       pkgAppliance.add(mUserName)
       pkgAppliance.add("-nocleanup")
-      
+
       var i: Int = 1
-      
+
       println("Packaging command:")
-      
+
       import scala.collection.JavaConversions._
-      
+
       for (e <- pkgAppliance) {
         println(s"Arg $i : $e")
         i += 1
       }
-      
+
       mPB = new ProcessBuilder(pkgAppliance)
       mPB.directory(new File(mPackagePath))
-      
+
       println("Starting pkg_appliance")
-      
+
       mProc = mPB.start
-      
+
       val name: Option[String] = mPackageLogs.get(mPackageStep.toString)
-      
+
       name match {
         case Some(name) =>
           val logname: String = s"${mLogPath}/${name}"
           val log: File = new File(logname)
-          
+
           if (log.exists) {
             println("Deleting old log")
             log.delete
           }
-          
+
           val instr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-          
+
           mInputReader = new StreamReader(mProc.getInputStream, "INPUT: ", instr)
-          
+
           val errstr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-          
+
           mErrorReader = new StreamReader(mProc.getErrorStream, "ERROR: ", errstr)
           mInputReader.start
           mErrorReader.start
-          
+
           println("Waiting for pkg_appliance")
-          
+
           mProc.waitFor
           rc = mProc.exitValue
-          
+
           println(s"Exit value $rc")
           rc
 
@@ -2746,35 +2746,35 @@ class BldServer(val config: BldServerConfig) {
 
   private def pkgSOI: Int = {
     setPackageStep(PackageStep.PKG_SOI, "Running pkg_soi")
-    
+
     if (!(mOS == "LINUX")) {
       println(s"Skipping SOI VM packaging for OS ${mOS.get}")
       return 0
     }
-    
+
     var rc: Int = 0
-    
+
     try {
       // Make the working directory first (under the main packaging directory)
       val workingDir: String = mPackagePath + "/tmp"
       val dir: File = new File(workingDir)
-    
+
       if (!dir.exists) {
         if (!dir.mkdir) {
           Console.err.println(s"Failed to make working directory $workingDir")
           return 1
         }
       }
-      
+
       // Set directory to be writable by anyone (req'd for vssrt)
       dir.setWritable(true, false)
 
       // Copy the pkg_common and template scripts to the Packaging directory
       copyFile("pkg_soi", mTOP + "/Inst/src", mPackagePath)
       copyFile("pkg_common", mTOP + "/Inst/src", mPackagePath)
-      
+
       val pkgSOI: java.util.ArrayList[String] = new java.util.ArrayList[String]
-      
+
       pkgSOI.add("ssh")
       pkgSOI.add("-t")
       pkgSOI.add("-t")
@@ -2792,52 +2792,52 @@ class BldServer(val config: BldServerConfig) {
       pkgSOI.add(mBuildTag.get)
       pkgSOI.add("-u")
       pkgSOI.add(mUserName)
-      
+
       var i: Int = 1
-      
+
       println("Packaging command:")
-      
+
       import scala.collection.JavaConversions._
-      
+
       for (e <- pkgSOI) {
         println(s"Arg $i : $e")
         i += 1
       }
-      
+
       mPB = new ProcessBuilder(pkgSOI)
       mPB.directory(new File(mPackagePath))
-      
+
       println("Starting pkg_soi")
-      
+
       mProc = mPB.start
-      
+
       val name: Option[String] = mPackageLogs.get(mPackageStep.toString)
-      
+
       name match {
         case Some(name) =>
           val logname: String = mLogPath + "/" + name
           val log: File = new File(logname)
-          
+
           if (log.exists) {
             println("Deleting old log")
             log.delete
           }
 
           val instr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-          
+
           mInputReader = new StreamReader(mProc.getInputStream, "INPUT: ", instr)
-          
+
           val errstr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-          
+
           mErrorReader = new StreamReader(mProc.getErrorStream, "ERROR: ", errstr)
           mInputReader.start
           mErrorReader.start
-          
+
           println("Waiting for pkg_soi")
-          
+
           mProc.waitFor
           rc = mProc.exitValue
-          
+
           println(s"Exit value $rc")
           rc
 
@@ -2865,35 +2865,35 @@ class BldServer(val config: BldServerConfig) {
 
   private def pkgSysMon: Int = {
     setPackageStep(PackageStep.PKG_SYSMON, "Running pkg_sysmon")
-    
+
     if (!(mOS == "LINUX")) {
       println(s"Skipping Hyperic VM packaging for OS ${mOS.get}")
       return 0
     }
 
     var rc: Int = 0
-    
+
     try {
       // Make the working directory first (under the main packaging directory)
       val workingDir: String = mPackagePath + "/tmp"
       val dir: File = new File(workingDir)
-    
+
       if (!dir.exists) {
         if (!dir.mkdir) {
           Console.err.println(s"Failed to make working directory $workingDir")
           return 1
         }
       }
-      
+
       // Set directory to be writable by anyone (req'd for vssrt)
       dir.setWritable(true, false)
 
       // Copy the pkg_common and template scripts to the Packaging directory
       copyFile("pkg_sysmon", mTOP + "/Inst/src", mPackagePath)
       copyFile("pkg_common", mTOP + "/Inst/src", mPackagePath)
-      
+
       val pkgSysMon: java.util.ArrayList[String] = new java.util.ArrayList[String]
-      
+
       pkgSysMon.add("ssh")
       pkgSysMon.add("-t")
       pkgSysMon.add("-t")
@@ -2911,52 +2911,52 @@ class BldServer(val config: BldServerConfig) {
       pkgSysMon.add(mBuildTag.get)
       pkgSysMon.add("-u")
       pkgSysMon.add(mUserName)
-      
+
       var i: Int = 1
-      
+
       println("Packaging command:")
-      
+
       import scala.collection.JavaConversions._
-      
+
       for (e <- pkgSysMon) {
         println(s"Arg $i : $e")
         i += 1
       }
-      
+
       mPB = new ProcessBuilder(pkgSysMon)
       mPB.directory(new File(mPackagePath))
-      
+
       println("Starting pkg_sysmon")
-      
+
       mProc = mPB.start
-      
+
       val name: Option[String] = mPackageLogs.get(mPackageStep.toString)
-      
+
       name match {
         case Some(name) =>
           val logname: String = mLogPath + "/" + name
           val log: File = new File(logname)
-          
+
           if (log.exists) {
             println("Deleting old log")
             log.delete
           }
-          
+
           val instr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-          
+
           mInputReader = new StreamReader(mProc.getInputStream, "INPUT: ", instr)
-          
+
           val errstr: java.io.OutputStream = new java.io.FileOutputStream(logname, true)
-          
+
           mErrorReader = new StreamReader(mProc.getErrorStream, "ERROR: ", errstr)
           mInputReader.start
           mErrorReader.start
-          
+
           println("Waiting for pkg_sysmon")
-          
+
           mProc.waitFor
           rc = mProc.exitValue
-          
+
           println(s"Exit value $rc")
           rc
 
@@ -2984,19 +2984,19 @@ class BldServer(val config: BldServerConfig) {
 
   private def doBuild: Int = {
     var rc: Int = 0
-    
+
     try {
       mBuildStep = BuildStep.NONE
       mFailedBuildStep = BuildStep.NONE
       mID = getId
-    
+
       if (mID == None) {
         return 1
       }
 
       if (mCreateODBUser) {
         rc = createODBUser
-      
+
         if (rc != 0) {
           Console.err.println("Create new ODB user failed.")
           return rc
@@ -3006,24 +3006,24 @@ class BldServer(val config: BldServerConfig) {
         if (mODBUser != None) {
           println(s"Reusing existing ODB user ${mODBUser.get}")
           rc = checkODB
-      
+
           if (rc != 0) {
             return rc
           }
         }
       }
-      
+
       if (mRunBuild) {
-        // Check version of SS we are building. vss_build only came in 9.2 and 
+        // Check version of SS we are building. vss_build only came in 9.2 and
         // later. Earlier versions will use jam and BldDatabase.
         if (mIsLegacyServer) {
           rc = jamExports
-      
+
           if (rc != 0) {
             Console.err.println("jam exports failed.")
             return rc
           }
-      
+
           if (mODBUser != None && mODBPassword != None && mODBInstance != None && mRunBuildODB) {
             rc = bldDatabase
             if (rc != 0) {
@@ -3036,12 +3036,12 @@ class BldServer(val config: BldServerConfig) {
           // For 9.2 and later, we'll use vss_build
           if (mRunBuildClean) {
             rc = vssbuildclean
-      
+
             if (rc != 0) {
               Console.err.println("vss_build clean failed.")
               return rc
             }
-      
+
             println("Removing queues directory.")
             deleteDirectory(s"{mTOP.get}/queues")
           }
@@ -3051,17 +3051,17 @@ class BldServer(val config: BldServerConfig) {
             return rc
           }
         }
-        
+
         if (mRunBuildODB) {
           rc = loadJavaPrivileges
-        
+
           if (rc != 0) {
             Console.err.println("Grant Java privileges failed.")
             return rc
           }
         }
       }
-      
+
       if (mRunSetup) {
         if (mRunBldRuntime) {
           // Remove the old CDS_TOP if BldRuntime and Rebuilding the ODB were
@@ -3071,82 +3071,82 @@ class BldServer(val config: BldServerConfig) {
             println("Removing CDS_TOP directory.")
             deleteDirectory(mCDSTOP.get)
           }
-          
+
           rc = bldRuntime(mODBUser.get, mODBPassword.get, mODBInstance.get)
-          
+
           if (rc != 0) {
             Console.err.println("BldRuntime failed.")
             return rc
           }
-          
+
           // If we are running in Clearcase, then move the binaries outside
           // of the VOB and create symlinks
           if (mIsClearCase) {
             rc = moveDirectories
-            
+
             if (rc != 0) {
               Console.err.println("Moving directories failed.")
               return rc
             }
           }
         }
-        
+
         if (mRunDataLoader) {
           rc = loadCompose
-        
+
           if (rc != 0) {
             Console.err.println("Compose deployment failed.")
             return rc
           }
-        
+
           rc = startLdap
           if (rc != 0) {
             Console.err.println("StartLdap failed.")
             return rc
           }
-        
+
           rc = dataLoader
-        
+
           if (rc != 0) {
             Console.err.println("DataLoader failed.")
             return rc
           }
-        
+
           rc = stopLdap
-        
+
           if (rc != 0) {
             Console.err.println("StopLdap failed.")
             return rc
           }
-        
+
           rc = postDataLoader
-        
+
           if (rc != 0) {
             Console.err.println("Post DataLoader failed.")
             return rc
           }
         }
-        
+
         rc = systemID
-        
+
         if (rc != 0) {
           Console.err.println("SystemID failed.")
           return rc
         }
       }
-      
+
       if (mRunJUnit) {
         rc = jUnit
-      
+
         if (rc != 0) {
           Console.err.println("JUnit run failed.")
           return rc
         }
       }
-      
+
       if (mRunFindBugs) {
         rc = findBugs
-      
+
         if (rc != 0) {
           Console.err.println("FindBugs failed.")
           return rc
@@ -3159,33 +3159,33 @@ class BldServer(val config: BldServerConfig) {
         ex.printStackTrace
       }
     } finally {  // Drop the ODB schema if it was created for Jenkins and copy the logs
-      
+
       // If the build step failed , save the failed step
       if (rc != 0) {
         mFailedBuildStep = mBuildStep
       }
-      
+
       // Log final step if everything was successful
       if (rc == 0) {
         setBuildStep(BuildStep.DONE, "Build Done")
       }
     }
-    
+
     rc
   }
 
   private def doPackaging: Int = {
     var rc: Int = 0
-    
+
     try {
       System.out.println("Running Packaging...")
       mPackageStep = PackageStep.NONE
       mFailedPackageStep = PackageStep.NONE
-    
+
       // Service Suite 9.1 and earlier use jam release
       if (mIsLegacyServer) {
         rc = jamRelease
-    
+
         if (rc != 0) {
           Console.err.println("jam release failed.")
           return rc
@@ -3199,46 +3199,46 @@ class BldServer(val config: BldServerConfig) {
           return rc
         }
       }
-    
+
       // If no ODB credentials passed, attempt to obtain it from StartEnv
       if (mODBUser == None || mODBPassword == None) {
         rc = getStartEnv
-    
+
         // If StartEnv failed to get the ODB info, try and create the ODB
         // user automatically (this is the case for AutoPackage).
         if (rc != 0) {
           rc = createODBUser
-    
+
           if (rc != 0) {
             Console.err.println("Create new ODB user failed.")
             return rc
           }
         }
       }
-    
+
       rc = pkgAll
-    
+
       if (rc != 0) {
         Console.err.println("pkg_all failed.")
         return rc
       }
-    
+
       if (mRunPackageVM) {
         rc = pkgAppliance
         if (rc != 0) {
           Console.err.println("pkg_appliance failed.")
           return rc
         }
-    
+
         rc = pkgSOI
-    
+
         if (rc != 0) {
           Console.err.println("pkg_soi failed.")
           return rc
         }
-    
+
         rc = pkgSysMon
-    
+
         if (rc != 0) {
           Console.err.println("pkg_sysmon failed.")
           return rc
@@ -3255,20 +3255,20 @@ class BldServer(val config: BldServerConfig) {
       if (rc != 0) mFailedPackageStep = mPackageStep
 
       // Insert code here to copy logs, if any
-      // For now, there are no additional logs/artifacts to copy    
+      // For now, there are no additional logs/artifacts to copy
       setPackageStep(PackageStep.COPY_LOGS, "Copying Logs")
-    
+
       // Log final step only if everything was successful
       if (rc == 0) setPackageStep(PackageStep.DONE, "Packaging Done")
     }
-    
+
     rc
   }
 
   private def writeResult(success: Boolean, stepname: String, msg: String) {
-    
+
     val prop: Properties = new Properties
-    
+
     try {
       if (success) {
         prop.setProperty("RESULT", "PASS")
@@ -3282,12 +3282,12 @@ class BldServer(val config: BldServerConfig) {
           prop.setProperty("FAILED_MSG", msg)
         }
       }
-    
+
       // First, try and use WORKSPACE. If not set (because the user is running
       // this from command line and not from Jenkins, then default to the log
       // path to store the build result.
       var path: String = System.getenv("WORKSPACE")
-    
+
       if (path == null) path = mLogPath
 
       prop.store(new java.io.FileOutputStream(path + "/BldServerResult.properties"), "BldServer report")
@@ -3318,9 +3318,9 @@ class BldServer(val config: BldServerConfig) {
 
         if (rc != 0) {
           println(s"\n*** Failed Step ${mFailedBuildStep.id} - ${mFailedBuildStep} ***")
-          
+
           val logname: Option[String] = mBuildLogs.get(mFailedBuildStep.toString)
-          
+
           if (logname != None)  println(s"Failed Logs: ${mLogPath}/${logname.get}")
 
           writeResult(false, mBuildStep.toString, "Some build message")
@@ -3334,33 +3334,33 @@ class BldServer(val config: BldServerConfig) {
 
         if (rc != 0) {
           println(s"\n*** Failed Step ${mFailedPackageStep.id} - ${mFailedPackageStep} ***")
-          
+
           val logname: Option[String] = mPackageLogs.get(mFailedPackageStep.toString)
-          
+
           if (logname != None) println(s"Failed Logs: ${mLogPath}/${logname}")
-          
+
           writeResult(false, mPackageStep.toString, "Some packaging message")
-          
+
           return rc
         }
       }
     } finally {
       if (mDropODBUser && mODBUser != None) {
         println("\n*** Dropping ODB user ***")
-        
+
         rc = dropDatabase
-        
+
         if (rc != 0) {
           Console.err.println("Drop ODB user failed.")
           return rc
         }
       }
     }
-    
+
     writeResult(true, null, null)
-    
+
     println("\n*** Finish ***")
-    
+
     return rc
   }
 }
