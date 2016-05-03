@@ -5,18 +5,18 @@ package com.abb.boltsfx
  */
 
 object BldServerException {
-  def apply: BldServerException = 
+  def apply: BldServerException =
     BldServerException()
-  
+
   def apply(message: String): BldServerException =
     BldServerException(optionMessage = Some(message))
-  
+
   def apply(cause: Throwable): BldServerException =
     BldServerException(optionCause = Some(cause))
-  
+
   def apply(message: String, cause: Throwable): BldServerException =
     BldServerException(optionMessage = Some(message), optionCause = Some(cause))
-  
+
   def apply(
     optionMessage: Option[String] = None,
     optionCause: Option[Throwable] = None,
