@@ -68,7 +68,7 @@ class BoltSFxPresenter(
   //   def computeValue() = types.getSelectionModel.getSelectedItem.run(from.text.value)
   // }
 
-  val odbUser = BoltFXML.props.getProperty("odb_user") 
+  val odbUser = BoltFXML.props.getProperty("odb_user")
   val odbPassword = BoltFXML.props.getProperty("odb_password")
   val odbInstance = BoltFXML.props.getProperty("odb_instance")
   val portOffset = BoltFXML.props.getProperty("uid")
@@ -136,7 +136,7 @@ class BoltSFxPresenter(
   vssVersionSpecific
 
   // Close button event handler
-  def onClose(event: ActionEvent) {    
+  def onClose(event: ActionEvent) {
     Platform.exit()
   }
 
@@ -390,19 +390,19 @@ val dialog = new Dialog[Result]() {
 }
  
 val progressBar = new ProgressBar {
-  prefWidth = 528 
+  prefWidth = 528
   maxWidth = 32767
   progress = 0.0
   progress <== BoltFXML.Model.Worker.progress
 }
 
 val progressDescriptionLabel = new Label {
-  prefWidth = 528 
+  prefWidth = 528
   maxWidth = 32767
 }
 
 val consoleTextField = new TextArea() {
-  prefWidth = 528 
+  prefWidth = 528
   maxWidth = 32767
   editable = false
   text = """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vel massa sit amet nisl pulvinar hendrerit. Praesent vitae ultrices velit. In sed neque non est posuere semper. Curabitur id fermentum ante. Sed lorem elit, luctus eu erat in, consectetur ornare nunc. Fusce a ligula facilisis, tincidunt orci eu, tristique tortor. Pellentesque iaculis libero pretium accumsan iaculis.
@@ -459,7 +459,7 @@ val grid = new GridPane() {
   padding = Insets(20, 20, 10, 20)
 
   add(new Label("Progress"), 0, 0)
-  add(progressBar, 0, 1) 
+  add(progressBar, 0, 1)
   add(progressDescriptionLabel, 0, 2)
   add(consoleTextField, 0, 3)
   add(runComposeLabel, 0, 4)
@@ -474,7 +474,7 @@ val loginButton = dialog.dialogPane().lookupButton(loginButtonType)
 loginButton.disable = true
  
 // Do some validation (disable when username is empty).
-username.text.onChange { (_, _, newValue) => 
+username.text.onChange { (_, _, newValue) =>
   loginButton.disable = newValue.trim().isEmpty
 }
  
@@ -526,7 +526,7 @@ result match {
 
       println(s"Bolt currently does not support VSS ${vssVersion}")
       sys.exit(1)
-    }    
+    }
   }
 
   private def vss9EnvCheck: Boolean = {
